@@ -1,9 +1,9 @@
-import { useEffect, useState, useMemo } from "react";
-import fetchAPI from "../hooks/fetchApi";
-import PlanetsContext from "./PlanetsContext";
+import { useEffect, useState, useMemo } from 'react';
+import useFetch from '../hooks/useFetch';
+import PlanetsContext from './PlanetsContext';
 
 function PlanetsProvider({ children }) {
-  const { loading, error, apiPlanet } = fetchAPI();
+  const { loading, error, apiPlanet } = useFetch();
   const [planets, setPlanets] = useState([]);
 
   useEffect(() => {
@@ -16,8 +16,8 @@ function PlanetsProvider({ children }) {
       });
       setPlanets(returnDelete);
     }
-    fetch("https://swapi.dev/api/planets");
-  }, []);
+    fetch('https://swapi.dev/api/planets');
+  }, [apiPlanet]);
 
   const values = useMemo(
     () => ({
@@ -25,11 +25,11 @@ function PlanetsProvider({ children }) {
       error,
       planets,
     }),
-    [loading, error, planets]
+    [loading, error, planets],
   );
 
   return (
-    <PlanetsContext.Provider value={values}>{children}</PlanetsContext.Provider>
+    <PlanetsContext.Provider value={ values }>{ children }</PlanetsContext.Provider>
   );
 }
 

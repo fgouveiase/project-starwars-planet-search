@@ -1,8 +1,8 @@
-import { useState } from "react";
+import { useState } from 'react';
 
-function fetchAPI() {
+function useFetch() {
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const [errors, setError] = useState(null);
 
   const apiPlanet = async (url) => {
     try {
@@ -22,9 +22,9 @@ function fetchAPI() {
 
   return {
     loading,
-    error,
+    errors,
     apiPlanet,
   };
 }
 
-export default fetchAPI;
+export default useFetch;
