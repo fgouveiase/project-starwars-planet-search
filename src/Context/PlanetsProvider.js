@@ -17,7 +17,7 @@ function PlanetsProvider({ children }) {
       setPlanets(returnDelete);
     }
     fetch('https://swapi.dev/api/planets');
-  }, [apiPlanet]);
+  }, []);
 
   const values = useMemo(
     () => ({
@@ -25,11 +25,13 @@ function PlanetsProvider({ children }) {
       error,
       planets,
     }),
-    [loading, error, planets],
+    [loading, error, planets, setPlanets],
   );
 
   return (
-    <PlanetsContext.Provider value={ values }>{ children }</PlanetsContext.Provider>
+    <PlanetsContext.Provider value={ values }>
+      { children }
+    </PlanetsContext.Provider>
   );
 }
 
