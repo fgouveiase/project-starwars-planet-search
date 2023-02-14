@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 // import PlanetsContext from '../Context/PlanetsContext';
 import FilterContext from '../Context/FilterContext';
 
@@ -8,11 +8,42 @@ function Table() {
     search,
     setSearch,
     matchFilterPlanets,
-    filterByValue: { column, comparison, valueInitial },
-    handleClick,
+    filterByValue,
+    setFilterByValue,
     handleChange,
+    handleClick,
+    setSortDirection,
   } = useContext(FilterContext);
 
+  const [filterOptionsColumn, setFilterOptionsColumn] = useState({
+    population: 'population',
+    orbital_period: 'orbital_period',
+    diameter: 'diameter',
+    rotation_period: 'rotation_period',
+    surface_water: 'surface_water' });
+
+  const [columnSortDirection, setcolumnSortDirection] = useState('population');
+  const [radioSort, setRadioSort] = useState('');
+
+  const { columnFilter, comparison, valueInitial } = filterByValue;
+
+  const handleFilter = () => {
+    handleClick();
+    // console.log('remove:', filterOptionsColumn[column]);
+    delete filterOptionsColumn[columnFilter];
+    setFilterByValue({ ...filterByValue,
+      columnFilter: Object.keys(filterOptionsColumn)[0] });
+    setFilterOptionsColumn({ ...filterOptionsColumn });
+  };
+
+  const columnArray = ['population', 'orbital_period',
+    'diameter', 'rotation_period', 'surface_water'];
+
+  function renderFilterOptionsColumn(col) {
+    return col.map((name) => (
+      <option key={ name } value={ name }>{ name }</option>
+    ));
+  }
   return (
 
     <>
@@ -27,17 +58,13 @@ function Table() {
 
       <div>
         <select
-          name="column"
+          name="columnFilter"
           id=""
           data-testid="column-filter"
-          value={ column }
+          value={ columnFilter }
           onChange={ handleChange }
         >
-          <option value="population">population</option>
-          <option value="orbital_period">orbital_period</option>
-          <option value="diameter">diameter</option>
-          <option value="rotation_period">rotation_period</option>
-          <option value="surface_water">surface_water</option>
+          { renderFilterOptionsColumn(Object.keys(filterOptionsColumn)) }
         </select>
 
         <select
@@ -62,13 +89,57 @@ function Table() {
         <button
           data-testid="button-filter"
           type="button"
-          onClick={ handleClick }
+          onClick={ handleFilter }
         >
           Filtrar
 
         </button>
       </div>
+      <label htmlFor="column-sort">
+        Ordenar
+        <select
+          id="column-sort"
+          name="column"
+          onChange={ ({ target: { value } }) => setcolumnSortDirection(value) }
+          data-testid="column-sort"
+        >
+          { renderFilterOptionsColumn(columnArray) }
+        </select>
+      </label>
 
+      <label htmlFor="ASC">
+        <input
+          type="radio"
+          data-testid="column-sort-input-asc"
+          name="sort"
+          id="ASC"
+          value="ASC"
+          onChange={ ({ target: { value } }) => setRadioSort(value) }
+        />
+        Ascendente
+      </label>
+
+      <label htmlFor="DESC">
+        <input
+          type="radio"
+          data-testid="column-sort-input-desc"
+          name="sort"
+          id="DESC"
+          value="DESC"
+          onChange={ ({ target: { value } }) => setRadioSort(value) }
+        />
+        Descendente
+      </label>
+
+      <button
+        data-testid="column-sort-button"
+        onClick={ () => setSortDirection({ order: {
+          column: columnSortDirection,
+          sort: radioSort,
+        } }) }
+      >
+        Ordenar
+      </button>
       <table>
         <thead>
           <tr>
@@ -88,21 +159,16 @@ function Table() {
           </tr>
         </thead>
         <tbody>
-          {matchFilterPlanets?.map((planet) => (
-            <tr key={ planet.name }>
-              <td>{planet.name}</td>
-              <td>{planet.rotation_period}</td>
-              <td>{planet.orbital_period}</td>
-              <td>{planet.diameter}</td>
-              <td>{planet.climate}</td>
-              <td>{planet.gravity}</td>
-              <td>{planet.terrain}</td>
-              <td>{planet.surface_water}</td>
-              <td>{planet.population}</td>
-              <td>{planet.films}</td>
-              <td>{planet.created}</td>
-              <td>{planet.edited}</td>
-              <td>{planet.url}</td>
+          {matchFilterPlanets?.map((planet, i) => (
+            <tr key={ `${planet.name}${i}` }>
+              { Object.values(planet).map((value, index) => (
+                <td
+                  key={ `${planet.name}${value}${index}` }
+                  data-testid={ planet.name === value && 'planet-name' }
+                >
+                  { value }
+                </td>
+              ))}
             </tr>
           ))}
         </tbody>
